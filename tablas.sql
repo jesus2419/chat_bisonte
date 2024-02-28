@@ -8,7 +8,8 @@ CREATE TABLE Usuarios (
     Apellidos VARCHAR(255) NOT NULL,
     Telefono VARCHAR(15),
     TipoUsuario VARCHAR(20) NOT NULL,
-    ImagenBlop BLOB
+    ImagenBlop BLOB,
+    estado bool
 );
 CREATE TABLE Mensajes (
     ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -126,6 +127,26 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE ActualizarEstadoUsuario(
+    IN pUsuarioID INT,
+    IN pNuevoEstado BOOL
+)
+BEGIN
+    -- Actualizar el estado del usuario
+    UPDATE Usuarios
+    SET estado = pNuevoEstado
+    WHERE ID = pUsuarioID;
+END //
+
+DELIMITER ;
+
+
+
+
 SELECT * FROM Usuarios WHERE Usuario = 'jesus';
 select * from  Usuarios;
 SELECT ID, Usuario, Nombre, Apellidos FROM Usuarios;

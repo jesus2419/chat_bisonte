@@ -20,6 +20,142 @@ CREATE TABLE Mensajes (
     FOREIGN KEY (DestinatarioID) REFERENCES Usuarios(ID)
 );
 
+CREATE TABLE llamada_grupo (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Fecha_llamada DATETIME NOT NULL,
+    grupo_id INT NOT NULL,
+    estado_llamada bool,
+	FOREIGN KEY (grupo_id) REFERENCES Grupo(ID)
+
+);
+select * from llamada_grupo;
+DELIMITER //
+
+CREATE PROCEDURE InsertarLlamadaGrupo(
+    IN pGrupoID INT
+)
+BEGIN
+    -- Declarar una variable para la fecha actual
+    DECLARE fechaActual DATETIME;
+
+    -- Obtener la fecha y hora actual
+    SET fechaActual = NOW();
+
+    -- Insertar la llamada en el grupo
+    INSERT INTO llamada_grupo (Fecha_llamada, grupo_id, estado_llamada)
+    VALUES (fechaActual, pGrupoID, 1);
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE ActualizarEstadosLlamadas_grupo(
+    IN pRemitenteID INT
+)
+BEGIN
+    -- Actualizar el estado de las llamadas para el remitente dado
+    UPDATE llamada_grupo
+    SET estado_llamada = 0
+    WHERE grupo_id = pRemitenteID;
+END //
+
+DELIMITER ;
+
+
+
+SELECT
+    LG.ID AS LlamadaID,
+    LG.Fecha_llamada,
+    LG.estado_llamada,
+    MG.ID AS MiembroID,
+    MG.FechaUnion,
+    U.ID AS UsuarioID,
+    U.Usuario,
+    G.ID AS GrupoID,
+    G.Nombre AS NombreGrupo,
+    G.Descripcion,
+    G.Fecha_creacion,
+    G.Creador_ID,
+    G.ImagenBlop  -- Agregado para obtener la imagen BLOB
+FROM llamada_grupo LG
+JOIN MiembrosGrupo MG ON LG.grupo_id = MG.GrupoID
+JOIN Usuarios U ON MG.UsuarioID = U.ID
+JOIN Grupo G ON MG.GrupoID = G.ID;
+
+
+
+
+
+CREATE TABLE llamada (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Fecha_llamada DATETIME NOT NULL,
+    RemitenteID INT NOT NULL,
+    DestinatarioID INT NOT NULL,
+    estado_llamada bool,
+    FOREIGN KEY (RemitenteID) REFERENCES Usuarios(ID),
+    FOREIGN KEY (DestinatarioID) REFERENCES Usuarios(ID)
+);
+
+DELIMITER //
+
+CREATE PROCEDURE InsertarLlamada(
+    IN pRemitenteID INT,
+    IN pDestinatarioID INT
+)
+BEGIN
+    -- Declarar una variable para la fecha actual
+    DECLARE fechaActual DATETIME;
+
+    -- Obtener la fecha y hora actual
+    SET fechaActual = NOW();
+
+    -- Insertar la llamada en la tabla
+    INSERT INTO llamada (Fecha_llamada, RemitenteID, DestinatarioID, estado_llamada)
+    VALUES (fechaActual, pRemitenteID, pDestinatarioID, 1);
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE ActualizarEstadosLlamadas(
+    IN pRemitenteID INT
+)
+BEGIN
+    -- Actualizar el estado de las llamadas para el remitente dado
+    UPDATE llamada
+    SET estado_llamada = 0
+    WHERE RemitenteID = pRemitenteID;
+END //
+
+DELIMITER ;
+
+
+
+select  ID ,
+    Fecha_llamada ,
+    RemitenteID ,
+    DestinatarioID ,
+    estado_llamada  from llamada;
+SELECT
+    llamada.ID,
+    llamada.Fecha_llamada,
+    llamada.RemitenteID,
+    remitente.Usuario,
+    llamada.DestinatarioID,
+    llamada.estado_llamada
+FROM
+    llamada
+JOIN
+    usuarios AS remitente ON remitente.ID = llamada.RemitenteID;
+
+select * from Usuarios;
+
 
 
 CREATE TABLE Grupo (
